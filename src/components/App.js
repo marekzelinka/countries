@@ -1,6 +1,61 @@
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 
+const CountryDetails = ({ country }) => {
+  const [weather, setWeather] = useState(null)
+
+  useEffect(() => {
+    const WEATHERSTACK_ACCESS_KEY =
+      process.env.REACT_APP_WEATHERSTACK_ACCESS_KEY
+    if (WEATHERSTACK_ACCESS_KEY === undefined) {
+      throw new Error('Define the WEATHERSTACK_ACCESS_KEY env var.')
+    }
+
+    axios
+      .get(
+        `http://api.weatherstack.com/current?access_key=${WEATHERSTACK_ACCESS_KEY}&query=${country.capital}`
+      )
+      .then((res) => setWeather(res.data))
+  }, [country.capital])
+
+  return (
+    <div>
+      <h1>{country.name}</h1>
+      <div>capital {country.capital}</div>
+      <div>population {country.population}</div>
+      <h2>Spoken languages</h2>
+      <ul>
+        {country.languages.map((language) => (
+          <li key={language.name}>{language.name}</li>
+        ))}
+      </ul>
+      <img
+        src={country.flag}
+        alt=""
+        style={{ width: 250, border: '1px solid' }}
+      />
+      <h2>Weather in {country.capital}</h2>
+      {weather === null ? (
+        <div>Loading...</div>
+      ) : (
+        <div>
+          <div>
+            <strong>temperature:</strong> {weather.current.temperature} Celcius
+          </div>
+          <img
+            src={weather.current.weather_icons[0]}
+            alt={weather.current.weather_descriptions}
+          />
+          <div>
+            <strong>wind:</strong> {weather.current.wind_speed} mph direction{' '}
+            {weather.current.wind_dir}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 const App = () => {
   const [countries, setCountries] = useState([])
   const [filter, setFilter] = useState('')
@@ -30,39 +85,9 @@ const App = () => {
         />
       </div>
       {selected !== null ? (
-        <div>
-          <h1>{selected.name}</h1>
-          <div>capital {selected.capital}</div>
-          <div>population {selected.population}</div>
-          <h2>Spoken languages</h2>
-          <ul>
-            {selected.languages.map((language) => (
-              <li key={language.name}>{language.name}</li>
-            ))}
-          </ul>
-          <img
-            src={selected.flag}
-            alt=""
-            style={{ width: 250, border: '1px solid' }}
-          />
-        </div>
+        <CountryDetails country={selected} />
       ) : countriesToShow.length === 1 ? (
-        <div>
-          <h1>{countriesToShow[0].name}</h1>
-          <div>capital {countriesToShow[0].capital}</div>
-          <div>population {countriesToShow[0].population}</div>
-          <h2>Spoken languages</h2>
-          <ul>
-            {countriesToShow[0].languages.map((language) => (
-              <li key={language.name}>{language.name}</li>
-            ))}
-          </ul>
-          <img
-            src={countriesToShow[0].flag}
-            alt=""
-            style={{ width: 250, border: '1px solid' }}
-          />
-        </div>
+        <CountryDetails country={countriesToShow[0]} />
       ) : countriesToShow.length > 10 ? (
         <div>Too many matches, specify another filter</div>
       ) : (
