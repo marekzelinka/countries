@@ -34,7 +34,7 @@ const App = () => {
           <h1>{selected.name}</h1>
           <div>capital {selected.capital}</div>
           <div>population {selected.population}</div>
-          <h2>languages</h2>
+          <h2>Spoken languages</h2>
           <ul>
             {selected.languages.map((language) => (
               <li key={language.name}>{language.name}</li>
@@ -51,7 +51,7 @@ const App = () => {
           <h1>{countriesToShow[0].name}</h1>
           <div>capital {countriesToShow[0].capital}</div>
           <div>population {countriesToShow[0].population}</div>
-          <h2>languages</h2>
+          <h2>Spoken languages</h2>
           <ul>
             {countriesToShow[0].languages.map((language) => (
               <li key={language.name}>{language.name}</li>
