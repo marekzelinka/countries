@@ -4,12 +4,7 @@ import { useEffect, useState } from 'react'
 const App = () => {
   const [countries, setCountries] = useState([])
   const [filter, setFilter] = useState('')
-  const countriesToShow =
-    filter.length === 0
-      ? countries
-      : countries.filter((country) =>
-          country.name.toLowerCase().includes(filter.toLowerCase())
-        )
+  const [selected, setSelected] = useState(null)
 
   useEffect(() => {
     axios
@@ -17,13 +12,41 @@ const App = () => {
       .then((res) => setCountries(res.data))
   }, [])
 
+  const countriesToShow =
+    filter.length === 0
+      ? countries
+      : countries.filter((country) =>
+          country.name.toLowerCase().includes(filter.toLowerCase())
+        )
+
   return (
     <div>
       <div>
         find countries{' '}
-        <input value={filter} onChange={(e) => setFilter(e.target.value)} />
+        <input
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          onFocus={() => setSelected(null)}
+        />
       </div>
-      {countriesToShow.length === 1 ? (
+      {selected !== null ? (
+        <div>
+          <h1>{selected.name}</h1>
+          <div>capital {selected.capital}</div>
+          <div>population {selected.population}</div>
+          <h2>languages</h2>
+          <ul>
+            {selected.languages.map((language) => (
+              <li key={language.name}>{language.name}</li>
+            ))}
+          </ul>
+          <img
+            src={selected.flag}
+            alt=""
+            style={{ width: 250, border: '1px solid' }}
+          />
+        </div>
+      ) : countriesToShow.length === 1 ? (
         <div>
           <h1>{countriesToShow[0].name}</h1>
           <div>capital {countriesToShow[0].capital}</div>
@@ -45,7 +68,10 @@ const App = () => {
       ) : (
         <ul>
           {countriesToShow.map((country) => (
-            <li key={country.name}>{country.name}</li>
+            <li key={country.name}>
+              {country.name}{' '}
+              <button onClick={() => setSelected(country)}>show</button>
+            </li>
           ))}
         </ul>
       )}
